@@ -59,7 +59,7 @@ public class VideoDisplayActivity extends AppCompatActivity {
         setContentView(R.layout.activity_video_display);
 
         Bundle bundle = getIntent().getExtras();
-        selectedGestureName = bundle.getString("selectedGestureName");
+        selectedGestureName = bundle.getString("gestureToBeRecorded");
         selectedGestureURL = URLMap.get(selectedGestureName);
 
         // Start Downloading the video immediately after this activity loads //
@@ -72,7 +72,12 @@ public class VideoDisplayActivity extends AppCompatActivity {
         btnNext.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                Bundle bundle = new Bundle();
+                bundle.putString("gestureToBeRecorded", selectedGestureName);
+
                 Intent intent = new Intent(VideoDisplayActivity.this, RecordingActivity.class);
+                intent.putExtras(bundle);
                 startActivity(intent);
             }
         });
@@ -111,9 +116,9 @@ public class VideoDisplayActivity extends AppCompatActivity {
             try {
                 File SDCardRoot = Environment.getExternalStorageDirectory(); // location where you want to store
                 Log.d("DEBUG", "SD Card Root folder: " + SDCardRoot.getAbsolutePath());
-                directory = new File(SDCardRoot, "/my_folder/"); //create directory to keep your downloaded file
+                directory = new File(SDCardRoot, MainActivity.BASE_SD_CARD_DIR_NAME + "/downloaded"); //create directory to keep your downloaded file
                 if (!directory.exists()) {
-                    directory.mkdir();
+                    directory.mkdirs();
                 }
             } catch (Exception e) {
                 Log.e("Error", "Error: Problem finding/creating directory." + e);
@@ -209,9 +214,10 @@ public class VideoDisplayActivity extends AppCompatActivity {
         protected void onPostExecute(String text) {
 
             File f = null;
+            File SDCardRoot = null;
             try {
-                File SDCardRoot = Environment.getExternalStorageDirectory();
-                f = new File(SDCardRoot, "/my_folder/" + selectedGestureName + ".mp4"); // Directory where the file will be downloaded.
+                SDCardRoot = Environment.getExternalStorageDirectory();
+                f = new File(SDCardRoot, MainActivity.BASE_SD_CARD_DIR_NAME + "/downloaded/" + selectedGestureName + ".mp4"); // Directory where the file will be downloaded.
                 if (!f.exists()) {
                     Log.e("Error: ", "Video file not available.");
                     return;
@@ -230,7 +236,7 @@ public class VideoDisplayActivity extends AppCompatActivity {
                 }
             });
 
-            vv.setVideoPath(Environment.getExternalStorageDirectory()+"/my_folder/" + selectedGestureName + ".mp4");
+            vv.setVideoPath(SDCardRoot+ "/" + MainActivity.BASE_SD_CARD_DIR_NAME + "/downloaded/" + selectedGestureName + ".mp4");
             vv.start();
         }
     }

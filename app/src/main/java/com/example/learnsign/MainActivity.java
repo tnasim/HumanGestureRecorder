@@ -20,7 +20,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      * Name of the gesture that will be set here and passed to next screen.
      **/
     private String selectedGestureName = "buy";
+    public static String userName = "Tariq";
     private final String DEFAULT_DROPDOWN_SELECTION = "-- Select a gesture --";
+
+    public static final String BASE_SD_CARD_DIR_NAME = "LearnSign";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,8 +65,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             // Do nothing
             return;
         }
+
         Bundle bundle = new Bundle();
-        bundle.putString("selectedGestureName", selectedGestureName);
+        bundle.putString("gestureToBeRecorded", selectedGestureName);
 
         Intent intent = new Intent(MainActivity.this, VideoDisplayActivity.class);
         intent.putExtras(bundle);

@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,6 +24,8 @@ import java.net.URL;
 public class RecordingActivity extends AppCompatActivity {
 
     private static final int VIDEO_CAPTURE = 101;
+
+    String gestureToBeRecorded = "";
     private Uri fileUri;
 
     @Override
@@ -30,10 +33,15 @@ public class RecordingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recording);
 
+        Bundle bundle = getIntent().getExtras();
+        gestureToBeRecorded = bundle.getString("gestureToBeRecorded");
+
         Button bt1 = (Button) findViewById(R.id.button);
 
         if(!hasCamera()){
             bt1.setEnabled(false);
+            Log.w("DEBUG", "Camera not available.");
+            Toast.makeText(getApplicationContext(),"Camera Not Available",Toast.LENGTH_LONG).show();
         }
 
         bt1.setOnClickListener(new View.OnClickListener() {
@@ -187,21 +195,33 @@ public class RecordingActivity extends AppCompatActivity {
     }
 
 
-    public void startRecording()
-    {
-        File mediaFile = new
-                File(Environment.getExternalStorageDirectory().getAbsolutePath()
-                + "/myvideo.mp4");
+    public void startRecording() {
+        try {
+            File SDCardRoot = Environment.getExternalStorageDirectory();
 
+            File directory = new File(SDCardRoot, MainActivity.BASE_SD_CARD_DIR_NAME + "/recorded"); //create directory to keep your downloaded file
+            if (!directory.exists()) {
+                directory.mkdirs();
+            }
 
+            // TODO: increment practice number for each new record.
+            int practice_number = 1;
+            File mediaFile = new
+                    File(directory
+                    + "/" + gestureToBeRecorded + "_PRACTICE_"+ 1 + "_" + MainActivity.userName + ".mp4");
 
+            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+            StrictMode.setVmPolicy(builder.build());
 
-        Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT,5);
-        fileUri = Uri.fromFile(mediaFile);
+            Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+            intent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 5);
+            fileUri = Uri.fromFile(mediaFile);
 
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-        startActivityForResult(intent, VIDEO_CAPTURE);
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+            startActivityForResult(intent, VIDEO_CAPTURE);
+        } catch(Exception e) {
+            Toast.makeText(getApplicationContext(), "Problem in recording: " + e.getMessage() , Toast.LENGTH_LONG).show();
+        }
     }
 
     private boolean hasCamera() {
