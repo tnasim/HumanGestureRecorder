@@ -20,7 +20,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      * Name of the gesture that will be set here and passed to next screen.
      **/
     private String selectedGestureName = "buy";
-    public static String userName = "Tariq";
+    public static String userName = "Dummy";
+    public static int practiceCount = 1;
     private final String DEFAULT_DROPDOWN_SELECTION = "-- Select a gesture --";
 
     public static final String BASE_SD_CARD_DIR_NAME = "LearnSign";

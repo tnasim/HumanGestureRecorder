@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -73,8 +74,12 @@ public class VideoDisplayActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+                EditText usernameField = (EditText) findViewById(R.id.inputUsername);
+                MainActivity.userName = usernameField.getText().toString();
                 Bundle bundle = new Bundle();
                 bundle.putString("gestureToBeRecorded", selectedGestureName);
+
+//                bundle.putString("username", username);
 
                 Intent intent = new Intent(VideoDisplayActivity.this, RecordingActivity.class);
                 intent.putExtras(bundle);

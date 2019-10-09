@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">LearnSigns</string>
     <string name="title_activity_video">VideoActivity</string>
+    <string name="lbl_username">Username</string>
     <string-array name="gestures_array">
         <item>-- Select a gesture --</item>
         <item>house</item>

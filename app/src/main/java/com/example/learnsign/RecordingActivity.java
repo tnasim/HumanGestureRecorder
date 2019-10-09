@@ -208,7 +208,8 @@ public class RecordingActivity extends AppCompatActivity {
             int practice_number = 1;
             File mediaFile = new
                     File(directory
-                    + "/" + gestureToBeRecorded + "_PRACTICE_"+ 1 + "_" + MainActivity.userName + ".mp4");
+                    + "/" + gestureToBeRecorded + "_PRACTICE_"+ MainActivity.practiceCount + "_" + MainActivity.userName + ".mp4");
+            MainActivity.practiceCount = MainActivity.practiceCount + 1;
 
             StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
             StrictMode.setVmPolicy(builder.build());
