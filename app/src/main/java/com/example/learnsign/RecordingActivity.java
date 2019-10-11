@@ -51,13 +51,13 @@ public class RecordingActivity extends AppCompatActivity {
             }
         });
 
-        Button bt5 = (Button)findViewById(R.id.button4);
+        Button bt5 = (Button)findViewById(R.id.btnUpload);
         bt5.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                UploadTask up1 = new UploadTask();
+                UploadTask uploadTask = new UploadTask();
                 Toast.makeText(getApplicationContext(),"Stating to Upload",Toast.LENGTH_LONG).show();
-                up1.execute();
+                uploadTask.execute();
             }
         });
     }
@@ -68,8 +68,8 @@ public class RecordingActivity extends AppCompatActivity {
         protected String doInBackground(String... strings) {
             String boundary = "*****";
             File SDCardRoot = Environment.getExternalStorageDirectory(); // location where you want to store
-            File directory = new File(SDCardRoot, "/my_folder/"); //create directory to keep your downloaded file
-            final String fileName = "Action1" + ".mp4";
+            File directory = new File(SDCardRoot, MainActivity.BASE_SD_CARD_DIR_NAME + "/recorded/"); //create directory to keep your downloaded file
+            final String fileName = gestureToBeRecorded + "_PRACTICE_"+ (MainActivity.practiceCount-1) + "_" + MainActivity.userName + ".mp4";
             int bytesRead, bytesAvailable, bufferSize;
             byte[] buffer;
             int maxBufferSize = 1 * 1024 * 1024;
@@ -78,7 +78,7 @@ public class RecordingActivity extends AppCompatActivity {
                 OutputStream output = null;
                 try{
 
-                    URL url = new URL("http://10.218.107.121/cse535/upload_video.php"); // link of the song which you want to download like (http://...)
+                    URL url = new URL("http://10.218.107.121/cse535/upload_video.php"); // link of the upload site (provided by instructor)
                     HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
                     //urlConnection.setRequestMethod("POST");
                     //urlConnection.setReadTimeout(95 * 1000);
@@ -106,6 +106,10 @@ public class RecordingActivity extends AppCompatActivity {
                     urlConnection.setRequestProperty("ENCTYPE", "multipart/form-data");
                     urlConnection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
                     urlConnection.setRequestProperty("uploaded_file", fileName);
+                    urlConnection.setRequestProperty("group_id", "3"); // hard coded group ID
+                    urlConnection.setRequestProperty("id", "1212886322"); // Hard coded ASU ID
+                    urlConnection.setRequestProperty("accept", "1");
+
 
                     //urlConnection.connect();
 
@@ -168,7 +172,7 @@ public class RecordingActivity extends AppCompatActivity {
                 }
                 catch (Exception exception)
                 {
-
+                    Log.e("Error", "Problem while uploading: " + exception.getMessage());
                     //Toast.makeText(getApplicationContext(), "input exception in catch....."+ exception + "", Toast.LENGTH_LONG).show();
                     publishProgress(String.valueOf(exception));
 
@@ -180,6 +184,7 @@ public class RecordingActivity extends AppCompatActivity {
             }
             catch (Exception exception)
             {
+                Log.e("Error", "Problem uploading: " + exception.getMessage());
                 publishProgress(String.valueOf(exception));
             }
 
@@ -189,6 +194,7 @@ public class RecordingActivity extends AppCompatActivity {
 
         @Override
         protected void onProgressUpdate(String... text) {
+            Log.d("DEBUG", "Upload status: " + text[0]);
             Toast.makeText(getApplicationContext(), "In Background Task " + text[0], Toast.LENGTH_LONG).show();
         }
 
