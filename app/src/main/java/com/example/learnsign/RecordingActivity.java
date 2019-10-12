@@ -18,8 +18,11 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.util.HashMap;
 
 public class RecordingActivity extends AppCompatActivity {
 
@@ -80,23 +83,6 @@ public class RecordingActivity extends AppCompatActivity {
 
                     URL url = new URL("http://10.218.107.121/cse535/upload_video.php"); // link of the upload site (provided by instructor)
                     HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                    //urlConnection.setRequestMethod("POST");
-                    //urlConnection.setReadTimeout(95 * 1000);
-                    //urlConnection.setConnectTimeout(95 * 1000);
-                    //urlConnection.setDoInput(true);
-                    //urlConnection.setRequestProperty("Accept", "application/json");
-                    //urlConnection.setRequestProperty("X-Environment", "android");
-
-
-                    //urlConnection.setHostnameVerifier(new HostnameVerifier() {
-                    //    @Override
-                    //    public boolean verify(String hostname, SSLSession session) {
-                    /** if it necessarry get url verfication */
-                    //return HttpsURLConnection.getDefaultHostnameVerifier().verify("your_domain.com", session);
-                    //        return true;
-                    //   }
-                    //});
-                    //urlConnection.setSSLSocketFactory((SSLSocketFactory) SSLSocketFactory.getDefault());
 
                     urlConnection.setDoInput(true); // Allow Inputs
                     urlConnection.setDoOutput(true); // Allow Outputs
@@ -106,23 +92,36 @@ public class RecordingActivity extends AppCompatActivity {
                     urlConnection.setRequestProperty("ENCTYPE", "multipart/form-data");
                     urlConnection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
                     urlConnection.setRequestProperty("uploaded_file", fileName);
-                    urlConnection.setRequestProperty("group_id", "3"); // hard coded group ID
-                    urlConnection.setRequestProperty("id", "1212886322"); // Hard coded ASU ID
-                    urlConnection.setRequestProperty("accept", "1");
+//                    urlConnection.setRequestProperty("group_id", "3"); // hard coded group ID
+//                    urlConnection.setRequestProperty("id", "1212886322"); // Hard coded ASU ID
+//                    urlConnection.setRequestProperty("accept", "1");
 
 
-                    //urlConnection.connect();
+                    HashMap<String, String> parameters = new HashMap<>();
+                    parameters.put("group_id", "3");
+                    parameters.put("id", "1212886322");
+                    parameters.put("accept", "1");
+
+                    StringBuilder stringBuilder = new StringBuilder();
+                    int i = 0;
+                    for (String key : parameters.keySet()) {
+                        try {
+                            if (i != 0){
+                                stringBuilder.append("&");
+                            }
+                            stringBuilder.append(key).append("=")
+                                    .append(URLEncoder.encode(parameters.get(key), "UTF-8"));
+
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+                        i++;
+                    }
+                    String paramsString = stringBuilder.toString();
 
                     DataOutputStream dos = new DataOutputStream(urlConnection.getOutputStream());
+                    dos.writeBytes(paramsString);
 
-                    //dos.writeBytes(twoHyphens + boundary + lineEnd);
-                    //dos.writeBytes("Content-Disposition: form-data; name="uploaded_file";filename=""
-                    //               + fileName + """ + lineEnd);
-
-                    //      dos.writeBytes(lineEnd);
-
-                    // create a buffer of  maximum size
-                    //FileInputStream fileInputStream = new FileInputStream(directory+fileName);
                     FileInputStream input = new FileInputStream(new File(directory, fileName));
                     bytesAvailable = input.available();
                     publishProgress(String.valueOf(bytesAvailable));
@@ -144,8 +143,6 @@ public class RecordingActivity extends AppCompatActivity {
                     dos.flush();
                     dos.close();
                     input.close();
-                    //output = urlConnection.getOutputStream();
-                    //input = url.openStream();
 
                     int serverResponseCode = urlConnection.getResponseCode();
                     String serverResponseMessage = urlConnection.getResponseMessage();
@@ -158,16 +155,31 @@ public class RecordingActivity extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             public void run() {
 
-                                String msg = "File Upload Completed.\n\n See uploaded file here : \n\n"
-                                        +" http://www.androidexample.com/media/uploads/"
-                                        +fileName;
-
-                                //messageText.setText(msg);
                                 Toast.makeText(getApplicationContext(), "File Upload Complete.",
                                         Toast.LENGTH_SHORT).show();
                             }
                         });
                     }
+
+                    if( serverResponseMessage.equals("success") ){
+
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+
+                                Toast.makeText(getApplicationContext(), "File Upload Successful.",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } else {
+                        runOnUiThread(new Runnable() {
+                            public void run() {
+
+                                Toast.makeText(getApplicationContext(), "File Upload failed.",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+
 
                 }
                 catch (Exception exception)
