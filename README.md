@@ -10,9 +10,8 @@ Group 3
 - Tariq M Nasim
 ---------------------------------------------------------------------------
 App Name: LearnSign
-App description: The android app is used to show the users videos of sign-languages and allows the user to also record practice videos to the server.
----------------------------------------------------------------------------
 
+App description: The android app is used to show the users videos of sign-languages and allows the user to also record practice videos to the server.
 
 
 ## How to build the APK:
